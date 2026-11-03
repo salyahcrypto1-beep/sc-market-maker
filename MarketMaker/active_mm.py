@@ -29,7 +29,6 @@ cache = base.Client(('memcached', 11211))
 
 # Загрузка переменных окружения
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-CHAT_ID = os.environ.get("OWNER_CHAT_ID", "")
 
 
 class OrderBookAnalyzer:

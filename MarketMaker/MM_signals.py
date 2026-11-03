@@ -1,3 +1,4 @@
+from portable.access import LocalAccessMiddleware
 from portable.freshness import book_is_fresh, fresh_books
 from portable.access import pair_user
 import asyncio
@@ -39,7 +40,6 @@ logging.basicConfig(filename='logs/process_main.log', level=logging.INFO,
 
 #BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "") - test vers
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-CHAT_ID = os.environ.get("OWNER_CHAT_ID", "")
 
 cache = base.Client(('memcached', 11211))
 
@@ -104,10 +104,11 @@ class DataTokensCollector:
         self.user_search_query = {}
 
         self.active_users = []
-        self.local_black_list = ['FORM/USDT', 'TALK/USDT']
+        self.local_black_list = []
 
 
         self.bot = AsyncTeleBot(BOT_TOKEN)
+        self.bot.setup_middleware(LocalAccessMiddleware())
 
         self.bot.register_message_handler(self.start, commands=['start'])
         
@@ -519,7 +520,6 @@ class DataTokensCollector:
                     feeVolDol = feeVal * minAsks
                     signal_arr = [symbol, round(profit, 2), exBuy, exSell, exchanges_detected, networkBoth, has_price_gap_min, has_price_gap_max, feeVal, feeVolDol, buy_frequency, sell_frequency, total_volume_above_ask]
                     self.now_signals[f'{symbol}|{exBuy}|{exSell}|{networkBoth}'] = signal_arr
-                    #await self.bot.send_message(CHAT_ID, token_message, parse_mode='Markdown', disable_web_page_preview=True)
 
         except Exception as e:
             print(f"Error process_exchanges {e}")
