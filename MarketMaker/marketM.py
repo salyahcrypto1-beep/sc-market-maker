@@ -1,3 +1,4 @@
+from portable.freshness import book_is_fresh, fresh_books
 import asyncio
 from datetime import datetime, timedelta
 import logging
@@ -58,6 +59,7 @@ class DataTokensCollector:
                     
                     if value:
                         data = pickle.loads(gzip.decompress(value))
+                        data = fresh_books(data)
                         self.local_orderbooks[exchange] = data
 
                         for symbol, orderbook in data.items():
@@ -106,6 +108,7 @@ class DataTokensCollector:
                     
                     if value:
                         data = pickle.loads(gzip.decompress(value))
+                        data = fresh_books(data)
                         self.local_orderbooks[exchange] = data
                         
                         # Сохраняем историю стаканов для каждого токена

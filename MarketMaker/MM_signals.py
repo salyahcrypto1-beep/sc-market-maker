@@ -1,3 +1,4 @@
+from portable.freshness import book_is_fresh, fresh_books
 from portable.access import pair_user
 import asyncio
 from datetime import datetime, timedelta
@@ -224,6 +225,7 @@ class DataTokensCollector:
                     
                     if value:
                         data = pickle.loads(gzip.decompress(value))
+                        data = fresh_books(data)
                         self.local_orderbooks[exchange] = data
 
                 await asyncio.sleep(5)
@@ -235,7 +237,7 @@ class DataTokensCollector:
         """Получение ордербука для заданной биржи и токена"""
         try:
             orderbook = self.local_orderbooks.get(exchange, {}).get(symbol)
-            if orderbook:
+            if orderbook and book_is_fresh(orderbook):
                 return {
                     'bids': list(orderbook['bids'].items()) if isinstance(orderbook['bids'], OrderedDict) else orderbook['bids'],
                     'asks': list(orderbook['asks'].items()) if isinstance(orderbook['asks'], OrderedDict) else orderbook['asks'],
